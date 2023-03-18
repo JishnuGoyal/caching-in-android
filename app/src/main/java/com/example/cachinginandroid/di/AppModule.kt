@@ -1,11 +1,15 @@
 package com.example.cachinginandroid.di
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.LruCache
+import androidx.room.Room
 import coil.ImageLoader
 import coil.request.CachePolicy
 import com.example.cachinginandroid.api.DogsApi
+import com.example.cachinginandroid.data.DogDao
+import com.example.cachinginandroid.data.DogDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,4 +34,20 @@ object AppModule {
     @Singleton
     fun provideDogsApi(retrofit: Retrofit): DogsApi =
         retrofit.create(DogsApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideDogDatabase(app: Application): DogDatabase {
+        return Room.databaseBuilder(
+            app,
+            DogDatabase::class.java,
+            DogDatabase.DATABASE_NAME
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideDogDao(db: DogDatabase): DogDao {
+        return db.dogDao
+    }
 }

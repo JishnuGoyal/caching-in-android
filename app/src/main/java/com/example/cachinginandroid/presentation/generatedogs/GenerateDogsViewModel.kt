@@ -3,7 +3,6 @@ package com.example.cachinginandroid.presentation.generatedogs
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.util.Log
-import android.util.LruCache
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,14 +10,16 @@ import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.example.cachinginandroid.api.DogsApi
+import com.example.cachinginandroid.data.Dog
+import com.example.cachinginandroid.data.DogDao
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GenerateDogsViewModel @Inject constructor(
-    private val dogsApi: DogsApi
+    private val dogsApi: DogsApi,
+    private val dogDao: DogDao
 ) : ViewModel() {
 
     private val _urlLiveData = MutableLiveData<String?>(null)
@@ -44,6 +45,11 @@ class GenerateDogsViewModel @Inject constructor(
 
             }
         }
+    }
+    fun updateDatabase(time: Long, filename: String) {
+      viewModelScope.launch {
+          dogDao.insertDog(Dog(filename, time, urlLiveData.value!!))
+      }
     }
 
 }
